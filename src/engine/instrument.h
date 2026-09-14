@@ -102,6 +102,7 @@ enum DivInstrumentType: unsigned short {
   DIV_INS_UPD1771C=65,
   DIV_INS_SID3=66,
   DIV_INS_KLATTSCH=67,
+  DIV_INS_CGA1=68,
   DIV_INS_MAX,
   DIV_INS_NULL
 };
@@ -1067,6 +1068,22 @@ struct DivInstrumentKlattsch {
     formantShift(0) {}
 };
 
+struct DivInstrumentCGA1 {
+  unsigned short ticksPerReset;
+  unsigned short resetValue;
+  unsigned short lpfApproachSpeed;
+
+  bool operator==(const DivInstrumentCGA1& other);
+  bool operator!=(const DivInstrumentCGA1& other) {
+    return !(*this==other);
+  }
+
+  DivInstrumentCGA1():
+    ticksPerReset(8),
+    resetValue(0x5555),
+    lpfApproachSpeed(0xffff) {}
+};
+
 struct DivInstrumentPOD {
   DivInstrumentType type;
   DivInstrumentFM fm;
@@ -1087,6 +1104,7 @@ struct DivInstrumentPOD {
   DivInstrumentSID2 sid2;
   DivInstrumentSID3 sid3;
   DivInstrumentKlattsch klattsch;
+  DivInstrumentCGA1 cga1;
 
   DivInstrumentPOD() :
     type(DIV_INS_FM) {

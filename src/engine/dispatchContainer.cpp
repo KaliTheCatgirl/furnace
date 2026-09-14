@@ -19,6 +19,7 @@
 
 #include "blip_buf.h"
 #include "engine.h"
+#include "platform/cga1.h"
 #include "platform/genesis.h"
 #include "platform/genesisext.h"
 #include "platform/msm5232.h"
@@ -792,6 +793,9 @@ void DivDispatchContainer::init(DivSystem sys, DivEngine* eng, int chanCount, do
       } else {
         ((DivPlatformOPL*)dispatch)->setCore(eng->getConfInt("opl4Core",0));
       }
+      break;
+    case DIV_SYSTEM_CGA1:
+      dispatch=new DivPlatformCGA1;
       break;
     case DIV_SYSTEM_MULTIPCM:
       dispatch=new DivPlatformMultiPCM;

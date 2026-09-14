@@ -2775,6 +2775,15 @@ void DivEngine::registerSystems() {
     }
   );
 
+  sysDefs[DIV_SYSTEM_CGA1]=new DivSysDef(
+    _("CGA1-XNLP"), NULL, 0xe8, 0, 1, 1, 1,
+    false, true, 0, false, 0, 0, 0,
+    _("a xorshift-based fantasy periodic noise chip designed by Kali the Catgirl with a differential low-pass filter."),
+    DivChanDefFunc({
+      DivChanDef(_("Pulse"), "P", DIV_CH_PULSE, DIV_INS_CGA1)
+    })
+  );
+
   sysDefs[DIV_SYSTEM_DUMMY]=new DivSysDef(
     _("Dummy System"), NULL, 0xfd, 0, 8, 1, 128,
     false, true, 0, false, 0, 0, 0,

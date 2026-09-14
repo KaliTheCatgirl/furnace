@@ -212,6 +212,7 @@ const char* insTypes[DIV_INS_MAX+1][3]={
   {"NEC μPD1771C",ICON_FA_BAR_CHART,ICON_FUR_INS_UPD1771C},
   {"SID3",ICON_FA_KEYBOARD_O,ICON_FUR_INS_SID3},
   {"klattsch",ICON_FA_MICROPHONE,ICON_FA_MICROPHONE},
+  {"CGA1-XNLP",ICON_FA_BAR_CHART,ICON_FUR_INS_POKEMINI},
   {NULL,ICON_FA_QUESTION,ICON_FA_QUESTION}
 };
 
@@ -1385,6 +1386,7 @@ const int availableSystems[]={
   DIV_SYSTEM_SID3,
   DIV_SYSTEM_MULTIPCM,
   DIV_SYSTEM_KLATTSCH,
+  DIV_SYSTEM_CGA1,
   0 // don't remove this last one!
 };
 
@@ -1490,6 +1492,7 @@ const int chipsSpecial[]={
   DIV_SYSTEM_UPD1771C,
   DIV_SYSTEM_SID3,
   DIV_SYSTEM_KLATTSCH,
+  DIV_SYSTEM_CGA1,
   0 // don't remove this last one!
 };
 

@@ -151,5 +151,10 @@ void initSystemPresetsSpecialized(std::vector<FurnaceGUISysCategory>& sysCategor
       CH(DIV_SYSTEM_SUPERVISION, 1.0f, 0, "")
     }
   );
+  ENTRY(
+    _("CGA1-XNLP"), {
+      CH(DIV_SYSTEM_CGA1, 1.0f, 0, "")
+    }
+  )
   CATEGORY_END;
 }
