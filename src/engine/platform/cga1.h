@@ -21,54 +21,37 @@
 #define _CGA1_H
 
 #include "../dispatch.h"
-#include "../macroInt.h"
+#include "sound/cga/cga1.hpp"
 
 class DivPlatformCGA1: public DivDispatch {
   struct Channel: public SharedChannel {
-    unsigned char duty;
-    Channel(bool linear=true):
-      SharedChannel(2,linear),
-      duty(128) {}
+    bool requiresReconfig=false;
+    Channel(bool linear=true): SharedChannel(0xf,linear) {}
   };
-  Channel chan[1];
-  DivDispatchOscBuffer* oscBuf;
-  bool isMuted[1];
-  bool on;
-  int pos;
-  unsigned char timerScale, vol;
-  unsigned short preset, pivot;
-  unsigned char regPool[128];
-  unsigned short elapsedMain;
+  Channel chan[4];
+  DivDispatchOscBuffer* oscBuf[4];
   DivPitchTable pitchTable;
+  bool isMuted[4];
+  
+  cga::cga1_xnlp cga1;
 
-  void rWrite(unsigned char addr, unsigned char val);
-
-  friend void putDispatchChip(void*,int);
-  friend void putDispatchChan(void*,int,int);
-
+  void configure(size_t chan);
   public:
     void acquire(short** buf, size_t len);
-    int dispatch(DivCommand c);
-    SharedChannel* getChanState(int chan);
-    DivMacroInt* getChanMacroInt(int ch);
-    DivDispatchOscBuffer* getOscBuffer(int chan);
-    unsigned char* getRegisterPool();
-    int getRegisterPoolSize();
-    void reset();
-    void forceIns();
-    void tick(bool sysTick=true);
     void muteChannel(int ch, bool mute);
-    bool keyOffAffectsArp(int ch);
-    void setFlags(const DivConfig& flags);
+    int dispatch(DivCommand c);
+    void notifyInsChange(int ins);
     void notifyInsDeletion(void* ins);
     void notifyPitchTable(int sample=-1);
     unsigned int getMaxFreq(int ch);
-    void poke(unsigned int addr, unsigned short val);
-    void poke(std::vector<DivRegWrite>& wlist);
-    const char** getRegisterSheet();
+    SharedChannel* getChanState(int chan);
+    DivDispatchOscBuffer* getOscBuffer(int chan);
+    void setFlags(const DivConfig& flags);
+    void reset();
+    void tick(bool sysTick=true);
     int init(DivEngine* parent, int channels, int sugRate, const DivConfig& flags);
     void quit();
-    ~DivPlatformCGA1();
+    // ~DivPlatformCGA1();
 };
 
 #endif

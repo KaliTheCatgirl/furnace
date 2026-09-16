@@ -1069,9 +1069,10 @@ struct DivInstrumentKlattsch {
 };
 
 struct DivInstrumentCGA1 {
-  unsigned short ticksPerReset;
+  unsigned short noisePeriod;
   unsigned short resetValue;
   unsigned short lpfApproachSpeed;
+  unsigned short lpfApproachDivider;
 
   bool operator==(const DivInstrumentCGA1& other);
   bool operator!=(const DivInstrumentCGA1& other) {
@@ -1079,9 +1080,10 @@ struct DivInstrumentCGA1 {
   }
 
   DivInstrumentCGA1():
-    ticksPerReset(8),
+    noisePeriod(7),
     resetValue(0x5555),
-    lpfApproachSpeed(0xffff) {}
+    lpfApproachSpeed(0xffff),
+    lpfApproachDivider(0) {}
 };
 
 struct DivInstrumentPOD {

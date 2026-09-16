@@ -786,6 +786,8 @@ src/engine/platform/oplAInterface.cpp
 src/engine/platform/ym2608Interface.cpp
 src/engine/platform/ym2610Interface.cpp
 
+src/engine/platform/sound/cga/cga1.cpp
+
 src/engine/fileOps/fileOpsCommon.cpp
 src/engine/fileOps/dmf.cpp
 src/engine/fileOps/fc.cpp

@@ -19,7 +19,6 @@
 
 #include "blip_buf.h"
 #include "engine.h"
-#include "platform/cga1.h"
 #include "platform/genesis.h"
 #include "platform/genesisext.h"
 #include "platform/msm5232.h"
@@ -97,6 +96,7 @@
 #include "platform/sid3.h"
 #include "platform/multipcm.h"
 #include "platform/dummy.h"
+#include "platform/cga1.h"
 #include "../ta-log.h"
 #include "song.h"
 
