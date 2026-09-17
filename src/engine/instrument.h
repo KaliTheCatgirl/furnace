@@ -1073,7 +1073,6 @@ struct DivInstrumentCGA1 {
   unsigned short resetValue;
   unsigned char lpfApproachSpeed;
   unsigned char lpfApproachDivider;
-  bool useLpf;
 
   bool operator==(const DivInstrumentCGA1& other);
   bool operator!=(const DivInstrumentCGA1& other) {
@@ -1084,8 +1083,7 @@ struct DivInstrumentCGA1 {
     noisePeriod(7),
     resetValue(1),
     lpfApproachSpeed(0xff),
-    lpfApproachDivider(0),
-    useLpf(false) {}
+    lpfApproachDivider(0) {}
 };
 
 struct DivInstrumentPOD {

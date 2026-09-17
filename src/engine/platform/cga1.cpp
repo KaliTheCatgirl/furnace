@@ -29,7 +29,6 @@ void DivPlatformCGA1::configure(size_t chan) {
     .lpf_approach_divider=ins->lpfApproachDivider,
     .volume=this->chan[chan].active?(uint8_t)(CLAMP(this->chan[chan].outVol,0,0xf)):(uint8_t)0,
     .muted=this->isMuted[chan],
-    .use_lpf=ins->useLpf,
   };
   cga1.channels[chan].config.timer_length=this->chan[chan].freq/(cga1.channels[chan].config.noise_period+1);
 }
@@ -40,7 +39,7 @@ void DivPlatformCGA1::acquire(short** buf, size_t len) {
   }
   for (size_t s=0; s<len; s++) {
     for (size_t i=0; i<4; i++) {
-      oscBuf[i]->putSample(s,cga1.channels[i].config.muted?0:(uint16_t)((uint32_t)(cga1.channels[i].config.use_lpf?cga1.channels[i].lpf_position:cga1.channels[i].scaled_lfsr_value)*(cga1.channels[i].config.volume)/15)+0x8000);
+      oscBuf[i]->putSample(s,cga1.channels[i].config.muted?0:(uint16_t)((uint32_t)(cga1.channels[i].lpf_position)*(cga1.channels[i].config.volume)/15)+0x8000);
     }
     cga1.cycle(16);
     buf[0][s]=cga1.mix()+0x8000;

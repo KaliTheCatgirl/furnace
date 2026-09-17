@@ -44,7 +44,6 @@ struct cga1_channel {
         uint8_t volume = 0xf; // 4-bit
 
         bool muted = false;
-        bool use_lpf = false;
     } config{};
 
     void update_lfsr(void); // performs a xorshift on, and writebacks to, the lfsr value

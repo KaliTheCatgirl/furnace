@@ -898,8 +898,7 @@ bool DivInstrumentCGA1::operator==(const DivInstrumentCGA1& other) {
     _C(noisePeriod) &&
     _C(resetValue) &&
     _C(lpfApproachSpeed) &&
-    _C(lpfApproachDivider) &&
-    _C(useLpf)
+    _C(lpfApproachDivider)
   );
 }
 
@@ -1763,7 +1762,6 @@ void DivInstrument::writeFeatureC1(SafeWriter* w) {
   w->writeS(cga1.resetValue);
   w->writeC(cga1.lpfApproachSpeed);
   w->writeC(cga1.lpfApproachDivider);
-  w->writeC(cga1.useLpf);
 
   FEATURE_END;
 }
@@ -3441,7 +3439,6 @@ void DivInstrument::readFeatureC1(SafeReader& reader, short version) {
   if (reader.tell()<endOfFeat) cga1.resetValue=reader.readS();
   if (reader.tell()<endOfFeat) cga1.lpfApproachSpeed=reader.readC();
   if (reader.tell()<endOfFeat) cga1.lpfApproachDivider=reader.readC();
-  if (reader.tell()<endOfFeat) cga1.useLpf=reader.readC();
 
   READ_FEAT_END;
 }

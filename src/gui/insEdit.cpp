@@ -7996,8 +7996,6 @@ void FurnaceGUI::drawInsEdit() {
           P(CWSliderScalar(_("LFSR Base Value"),ImGuiDataType_U32,&resetValue,&_ONE,&_SIXTY_FIVE_THOUSAND_FIVE_HUNDRED_THIRTY_FIVE)); rightClickable
           P(CWSliderScalar(_("LPF Approach Speed"),ImGuiDataType_U32,&lpfApproachSpeed,&_ZERO,&_TWO_HUNDRED_FIFTY_FIVE)); rightClickable
           P(CWSliderScalar(_("LPF Approach Divider"),ImGuiDataType_U32,&lpfApproachDivider,&_ONE,&_TWO_HUNDRED_FIFTY_SIX)); rightClickable
-          
-          P(ImGui::Checkbox(_("LPF"),&ins->cga1.useLpf));
 
           ins->cga1.noisePeriod=noisePeriod-1;
           ins->cga1.resetValue=resetValue;
