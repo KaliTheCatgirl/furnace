@@ -21,6 +21,7 @@
 
 const int _ZERO=0;
 const int _ONE=1;
+const int _TWO = 2;
 const int _THREE=3;
 const int _FOUR=4;
 const int _SEVEN=7;
@@ -36,6 +37,7 @@ const int _ONE_HUNDRED=100;
 const int _ONE_HUNDRED_TWENTY_SEVEN=127;
 const int _ONE_HUNDRED_SEVENTY_NINE=179;
 const int _TWO_HUNDRED_FIFTY_FIVE=255;
+const int _TWO_HUNDRED_FIFTY_SIX = 256;
 const int _FIVE_HUNDRED_ELEVEN=511;
 const int _TWO_THOUSAND_FORTY_SEVEN=2047;
 const int _FOUR_THOUSAND_NINETY_FIVE=4095;

@@ -7987,22 +7987,17 @@ void FurnaceGUI::drawInsEdit() {
           drawInsSID3(ins);
         }
         if (ins->type==DIV_INS_CGA1) if (ImGui::BeginTabItem("CGA1-XNLP")) {
-          const int _2 = 2;
-          const int _65535 = 65535;
-          const int _65536 = 65536;
-
           unsigned int noisePeriod=ins->cga1.noisePeriod+1;
           unsigned int resetValue=ins->cga1.resetValue;
           unsigned int lpfApproachSpeed=ins->cga1.lpfApproachSpeed;
           unsigned int lpfApproachDivider=ins->cga1.lpfApproachDivider+1;
           
-          P(CWSliderScalar("Noise Period",ImGuiDataType_U32,&noisePeriod,&_2,&_65536)); rightClickable
+          P(CWSliderScalar(_("Noise Period"),ImGuiDataType_U32,&noisePeriod,&_TWO,&_TWO_HUNDRED_FIFTY_SIX)); rightClickable
+          P(CWSliderScalar(_("LFSR Base Value"),ImGuiDataType_U32,&resetValue,&_ONE,&_SIXTY_FIVE_THOUSAND_FIVE_HUNDRED_THIRTY_FIVE)); rightClickable
+          P(CWSliderScalar(_("LPF Approach Speed"),ImGuiDataType_U32,&lpfApproachSpeed,&_ZERO,&_TWO_HUNDRED_FIFTY_FIVE)); rightClickable
+          P(CWSliderScalar(_("LPF Approach Divider"),ImGuiDataType_U32,&lpfApproachDivider,&_ONE,&_TWO_HUNDRED_FIFTY_SIX)); rightClickable
           
-          P(CWSliderScalar("LFSR Base Value",ImGuiDataType_U32,&resetValue,&_ONE,&_65535)); rightClickable
-          
-          P(CWSliderScalar("LPF Approach Speed",ImGuiDataType_U32,&lpfApproachSpeed,&_ZERO,&_65535)); rightClickable
-          
-          P(CWSliderScalar("LPF Approach Divider",ImGuiDataType_U32,&lpfApproachDivider,&_ONE,&_65536)); rightClickable
+          P(ImGui::Checkbox(_("LPF"),&ins->cga1.useLpf));
 
           ins->cga1.noisePeriod=noisePeriod-1;
           ins->cga1.resetValue=resetValue;
@@ -9191,10 +9186,13 @@ void FurnaceGUI::drawInsEdit() {
               }
               break;
             case DIV_INS_CGA1:
-              macroList.push_back(FurnaceGUIMacroDesc(_("Volume"),&ins->std.volMacro,0,2,160,uiColors[GUI_COLOR_MACRO_VOLUME]));
+              macroList.push_back(FurnaceGUIMacroDesc(_("Volume"),&ins->std.volMacro,0,0xf,160,uiColors[GUI_COLOR_MACRO_VOLUME]));
               macroList.push_back(FurnaceGUIMacroDesc(_("Arpeggio"),&ins->std.arpMacro,-120,120,160,uiColors[GUI_COLOR_MACRO_PITCH],true,NULL,macroHoverNote,false,NULL,true,ins->std.arpMacro.val));
-              macroList.push_back(FurnaceGUIMacroDesc(_("Pulse Width (squomp)"),&ins->std.dutyMacro,0,255,160,uiColors[GUI_COLOR_MACRO_OTHER]));
               macroList.push_back(FurnaceGUIMacroDesc(_("Pitch"),&ins->std.pitchMacro,-2048,2047,160,uiColors[GUI_COLOR_MACRO_PITCH],true,macroRelativeMode));
+              macroList.push_back(FurnaceGUIMacroDesc(_("Noise Period"),&ins->std.ex1Macro,2,256,160,uiColors[GUI_COLOR_MACRO_OTHER]));
+              macroList.push_back(FurnaceGUIMacroDesc(_("LFSR Base Value"),&ins->std.ex2Macro,1,65535,160,uiColors[GUI_COLOR_MACRO_OTHER]));
+              macroList.push_back(FurnaceGUIMacroDesc(_("LPF Approach Speed"),&ins->std.ex3Macro,0,255,160,uiColors[GUI_COLOR_MACRO_OTHER]));
+              macroList.push_back(FurnaceGUIMacroDesc(_("LPF Approach Divider"),&ins->std.ex4Macro,1,256,160,uiColors[GUI_COLOR_MACRO_OTHER]));
               break;
             case DIV_INS_MAX:
             case DIV_INS_NULL:

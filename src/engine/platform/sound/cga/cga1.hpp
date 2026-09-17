@@ -28,21 +28,23 @@ struct cga1_channel {
     uint32_t cycles_until_tick{}; // 24-bit, has -1 bias; a value of 1 will have a noise period of 2 ticks
     uint16_t ticks_until_reset{}; // has -1 bias
     uint16_t lfsr_value{}; // non-zero to create sound, zero to make the xorshift do nothing :P
+    uint16_t scaled_lfsr_value{}; // scaled by volume; anti-click measure
     
     uint16_t lpf_position{}; // the position of the LPF, which attempts to approach the LFSR value. the output of the chip
     uint16_t cycles_until_lpf_approach{}; // has -1 bias
     
     struct config {
         uint32_t timer_length = 0xffff; // number of clock cycles per LFSR tick (24-bit, has -1 bias)
-        uint16_t noise_period = 7; // number of LFSR ticks per reset (has -1 bias)
+        uint8_t noise_period = 7; // number of LFSR ticks per reset (has -1 bias)
         uint16_t lfsr_reset_value = 0;
         
-        uint16_t lpf_approach_speed = 0xffff; // how much to add to the LPF position every `lpf_approach_divider` cycles.
-        uint16_t lpf_approach_divider = 0; // how many cycles before an approach iteration happens (has -1 bias)
+        uint8_t lpf_approach_speed = 0xff; // how much to add to the LPF position every `lpf_approach_divider` cycles.
+        uint8_t lpf_approach_divider = 0; // how many cycles before an approach iteration happens (has -1 bias)
 
         uint8_t volume = 0xf; // 4-bit
 
         bool muted = false;
+        bool use_lpf = false;
     } config{};
 
     void update_lfsr(void); // performs a xorshift on, and writebacks to, the lfsr value

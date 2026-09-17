@@ -1069,10 +1069,11 @@ struct DivInstrumentKlattsch {
 };
 
 struct DivInstrumentCGA1 {
-  unsigned short noisePeriod;
+  unsigned char noisePeriod;
   unsigned short resetValue;
-  unsigned short lpfApproachSpeed;
-  unsigned short lpfApproachDivider;
+  unsigned char lpfApproachSpeed;
+  unsigned char lpfApproachDivider;
+  bool useLpf;
 
   bool operator==(const DivInstrumentCGA1& other);
   bool operator!=(const DivInstrumentCGA1& other) {
@@ -1081,9 +1082,10 @@ struct DivInstrumentCGA1 {
 
   DivInstrumentCGA1():
     noisePeriod(7),
-    resetValue(0x5555),
-    lpfApproachSpeed(0xffff),
-    lpfApproachDivider(0) {}
+    resetValue(1),
+    lpfApproachSpeed(0xff),
+    lpfApproachDivider(0),
+    useLpf(false) {}
 };
 
 struct DivInstrumentPOD {
@@ -1223,6 +1225,7 @@ struct DivInstrument: DivInstrumentPOD {
   void writeFeatureS2(SafeWriter* w);
   void writeFeatureS3(SafeWriter* w);
   void writeFeatureKT(SafeWriter* w);
+  void writeFeatureC1(SafeWriter* w);
 
   void readFeatureNA(SafeReader& reader, short version);
   void readFeatureFM(SafeReader& reader, short version);
@@ -1250,6 +1253,7 @@ struct DivInstrument: DivInstrumentPOD {
   void readFeatureS2(SafeReader& reader, short version);
   void readFeatureS3(SafeReader& reader, short version);
   void readFeatureKT(SafeReader& reader, short version);
+  void readFeatureC1(SafeReader& reader, short version);
 
   DivDataErrors readInsDataOld(SafeReader& reader, short version);
   DivDataErrors readInsDataNew(SafeReader& reader, short version, bool fui, DivSong* song);

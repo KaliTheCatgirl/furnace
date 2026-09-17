@@ -893,6 +893,16 @@ bool DivInstrumentKlattsch::operator==(const DivInstrumentKlattsch& other) {
   );
 }
 
+bool DivInstrumentCGA1::operator==(const DivInstrumentCGA1& other) {
+  return (
+    _C(noisePeriod) &&
+    _C(resetValue) &&
+    _C(lpfApproachSpeed) &&
+    _C(lpfApproachDivider) &&
+    _C(useLpf)
+  );
+}
+
 #undef _C
 
 #define CONSIDER(x,t) \
@@ -1746,6 +1756,18 @@ void DivInstrument::writeFeatureKT(SafeWriter* w) {
   FEATURE_END;
 }
 
+void DivInstrument::writeFeatureC1(SafeWriter* w) {
+  FEATURE_BEGIN("C1");
+
+  w->writeC(cga1.noisePeriod);
+  w->writeS(cga1.resetValue);
+  w->writeC(cga1.lpfApproachSpeed);
+  w->writeC(cga1.lpfApproachDivider);
+  w->writeC(cga1.useLpf);
+
+  FEATURE_END;
+}
+
 void DivInstrument::putInsData2(SafeWriter* w, bool fui, const DivSong* song, bool insName) {
   size_t blockStartSeek=0;
   size_t blockEndSeek=0;
@@ -1794,6 +1816,7 @@ void DivInstrument::putInsData2(SafeWriter* w, bool fui, const DivSong* song, bo
   bool featureS2=false;
   bool featureS3=false;
   bool featureKT=false;
+  bool featureC1=false;
 
   bool checkForWL=false;
 
@@ -2054,6 +2077,7 @@ void DivInstrument::putInsData2(SafeWriter* w, bool fui, const DivSong* song, bo
       case DIV_INS_UPD1771C:
         break;
       case DIV_INS_CGA1:
+        featureC1=true;
         break;
       case DIV_INS_MAX:
         break;
@@ -2116,6 +2140,9 @@ void DivInstrument::putInsData2(SafeWriter* w, bool fui, const DivSong* song, bo
     }
     if (klattsch!=defaultIns.klattsch) {
       featureKT=true;
+    }
+    if (cga1!=defaultIns.cga1) {
+      featureC1=true;
     }
   }
 
@@ -2275,6 +2302,9 @@ void DivInstrument::putInsData2(SafeWriter* w, bool fui, const DivSong* song, bo
   }
   if (featureKT) {
     writeFeatureKT(w);
+  }
+  if (featureC1) {
+    writeFeatureC1(w);
   }
 
   if (fui && (featureSL || featureWL)) {
@@ -3404,6 +3434,18 @@ void DivInstrument::readFeatureKT(SafeReader& reader, short version) {
   READ_FEAT_END;
 }
 
+void DivInstrument::readFeatureC1(SafeReader& reader, short version) {
+  READ_FEAT_BEGIN;
+
+  if (reader.tell()<endOfFeat) cga1.noisePeriod=reader.readC();
+  if (reader.tell()<endOfFeat) cga1.resetValue=reader.readS();
+  if (reader.tell()<endOfFeat) cga1.lpfApproachSpeed=reader.readC();
+  if (reader.tell()<endOfFeat) cga1.lpfApproachDivider=reader.readC();
+  if (reader.tell()<endOfFeat) cga1.useLpf=reader.readC();
+
+  READ_FEAT_END;
+}
+
 DivDataErrors DivInstrument::readInsDataNew(SafeReader& reader, short version, bool fui, DivSong* song) {
   unsigned char featCode[2];
   bool volIsCutoff=false;
@@ -3486,6 +3528,8 @@ DivDataErrors DivInstrument::readInsDataNew(SafeReader& reader, short version, b
       readFeatureS3(reader,version);
     } else if (memcmp(featCode,"KT",2)==0) { // Klattsch
       readFeatureKT(reader,version);
+    } else if (memcmp(featCode,"C1",2)==0) { // CGA1 
+      readFeatureC1(reader,version);
     } else {
       if (song==NULL && (memcmp(featCode,"SL",2)==0 || (memcmp(featCode,"WL",2)==0) || (memcmp(featCode,"LS",2)==0) || (memcmp(featCode,"LW",2)==0))) {
         // nothing

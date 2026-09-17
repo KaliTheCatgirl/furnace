@@ -25,8 +25,8 @@
 
 class DivPlatformCGA1: public DivDispatch {
   struct Channel: public SharedChannel {
-    bool requiresReconfig=false;
-    Channel(bool linear=true): SharedChannel(0xf,linear) {}
+    DivInstrumentCGA1 insCopy;
+    Channel(bool linear=true): SharedChannel(0xf,linear), insCopy() {}
   };
   Channel chan[4];
   DivDispatchOscBuffer* oscBuf[4];

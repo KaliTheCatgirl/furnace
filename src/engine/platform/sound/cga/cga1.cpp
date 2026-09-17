@@ -45,15 +45,16 @@ namespace cga {
             x ^= x << 8;
             this->lfsr_value = x;
         }
+        this->scaled_lfsr_value = (uint16_t)((uint32_t)(this->lfsr_value) * (uint32_t)(this->config.volume) / 15);
     }
     void cga1_channel::update_lpf(void) {
         uint16_t pos = this->lpf_position;
-        uint16_t target = this->lfsr_value;
+        uint16_t target = this->scaled_lfsr_value;
         uint16_t distance = pos > target ? pos - target : target - pos;
         
         if (distance < this->config.lpf_approach_speed) {
-            this->lpf_position = this->lfsr_value;
-        } else if (this->lpf_position > this->lfsr_value) {
+            this->lpf_position = target;
+        } else if (this->lpf_position > target) {
             this->lpf_position -= this->config.lpf_approach_speed;
         } else {
             this->lpf_position += this->config.lpf_approach_speed;
@@ -81,7 +82,7 @@ namespace cga {
         uint16_t output = 0;
         for (size_t i = 0; i < 4; i++) {
             if (this->channels[i].config.muted) { continue; }
-            output += (uint32_t)(this->channels[i].lpf_position) * this->channels[i].config.volume >> 6;
+            output += (this->channels[i].config.use_lpf ? this->channels[i].lpf_position : this->channels[i].scaled_lfsr_value) >> 2;
         }
         return output;
     }

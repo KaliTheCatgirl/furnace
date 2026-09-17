@@ -21,14 +21,15 @@
 #include "../engine.h"
 
 void DivPlatformCGA1::configure(size_t chan) {
-  DivInstrument* ins=parent->getIns(this->chan[chan].ins,DIV_INS_CGA1);
+  DivInstrumentCGA1* ins=&this->chan[chan].insCopy;
   cga1.channels[chan].config = {
-    .noise_period=ins->cga1.noisePeriod,
-    .lfsr_reset_value=ins->cga1.resetValue,
-    .lpf_approach_speed=ins->cga1.lpfApproachSpeed,
-    .lpf_approach_divider=ins->cga1.lpfApproachDivider,
-    .volume=this->chan[chan].active?(uint8_t)(this->chan[chan].vol):(uint8_t)0,
+    .noise_period=ins->noisePeriod,
+    .lfsr_reset_value=ins->resetValue,
+    .lpf_approach_speed=this->chan[chan].active?ins->lpfApproachSpeed:(uint8_t)0,
+    .lpf_approach_divider=ins->lpfApproachDivider,
+    .volume=this->chan[chan].active?(uint8_t)(CLAMP(this->chan[chan].outVol,0,0xf)):(uint8_t)0,
     .muted=this->isMuted[chan],
+    .use_lpf=ins->useLpf,
   };
   cga1.channels[chan].config.timer_length=this->chan[chan].freq/(cga1.channels[chan].config.noise_period+1);
 }
@@ -37,23 +38,9 @@ void DivPlatformCGA1::acquire(short** buf, size_t len) {
   for (size_t i=0; i<4; i++) {
     oscBuf[i]->begin(len);
   }
-  for (size_t s = 0; s < len; s++) {
+  for (size_t s=0; s<len; s++) {
     for (size_t i=0; i<4; i++) {
-      // logE("gfsdaga");
-      
-      // logE("cycles_until_tick: %u", (unsigned int)cga1.channels[i].cycles_until_tick);
-      // logE("ticks_until_reset: %u", (unsigned int)cga1.channels[i].ticks_until_reset);
-      // logE("lfsr_value: %u", (unsigned int)cga1.channels[i].lfsr_value);
-      // logE("lpf_position: %u", (unsigned int)cga1.channels[i].lpf_position);
-      // logE("cycles_until_lpf_approach: %u", (unsigned int)cga1.channels[i].cycles_until_lpf_approach);
-      // logE("noise_period: %u", (unsigned int)cga1.channels[i].config.noise_period);
-      // logE("lfsr_reset_value: %u", (unsigned int)cga1.channels[i].config.lfsr_reset_value);
-      // logE("lpf_approach_speed: %u", (unsigned int)cga1.channels[i].config.lpf_approach_speed);
-      // logE("lpf_approach_divider: %u", (unsigned int)cga1.channels[i].config.lpf_approach_divider);
-      // logE("volume: %u", (unsigned int)cga1.channels[i].config.volume);
-      // logE("muted: %u", (unsigned int)cga1.channels[i].config.muted);
-      // logE("timer_length: %u", (unsigned int)cga1.channels[i].config.timer_length);
-      oscBuf[i]->putSample(s,(uint32_t)(cga1.channels[i].lpf_position+0x8000)*(cga1.channels[i].config.volume)/15);
+      oscBuf[i]->putSample(s,cga1.channels[i].config.muted?0:(uint16_t)((uint32_t)(cga1.channels[i].config.use_lpf?cga1.channels[i].lpf_position:cga1.channels[i].scaled_lfsr_value)*(cga1.channels[i].config.volume)/15)+0x8000);
     }
     cga1.cycle(16);
     buf[0][s]=cga1.mix()+0x8000;
@@ -78,6 +65,11 @@ int DivPlatformCGA1::dispatch(DivCommand c) {
       }
       chan[c.chan].active=true;
       chan[c.chan].macroInit(ins);
+      chan[c.chan].insCopy=ins->cga1;
+      chan[c.chan].outVol=chan[c.chan].vol;
+      cga1.channels[c.chan].ticks_until_reset = 0;
+      cga1.channels[c.chan].cycles_until_tick = 0;
+      cga1.channels[c.chan].cycles_until_lpf_approach = 0;
       break;
     }
     case DIV_CMD_NOTE_OFF:
@@ -92,11 +84,25 @@ int DivPlatformCGA1::dispatch(DivCommand c) {
     case DIV_CMD_INSTRUMENT:
       if (chan[c.chan].ins!=c.value || c.value2==1) {
         chan[c.chan].ins=c.value;
+        chan[c.chan].insCopy=parent->getIns(chan[c.chan].ins,DIV_INS_STD)->cga1;
+        cga1.channels[c.chan].ticks_until_reset = 0;
+        cga1.channels[c.chan].cycles_until_tick = 0;
+        cga1.channels[c.chan].cycles_until_lpf_approach = 0;
       }
       break;
     case DIV_CMD_VOLUME:
       chan[c.chan].vol=c.value;
       if (chan[c.chan].vol>0xf) chan[c.chan].vol=0xf;
+      if (!chan[c.chan].std.vol.has) {
+        chan[c.chan].outVol=chan[c.chan].vol;
+      }
+      cga1.channels[c.chan].config.volume=chan[c.chan].vol;
+      break;
+    case DIV_CMD_GET_VOLUME:
+      if (chan[c.chan].std.vol.has) {
+        return chan[c.chan].vol;
+      }
+      return chan[c.chan].outVol;
       break;
     case DIV_CMD_PITCH:
       chan[c.chan].pitch=c.value;
@@ -191,7 +197,19 @@ void DivPlatformCGA1::tick(bool sysTick) {
   for (size_t i=0; i<4; i++) {
     chan[i].std.next();
     if (chan[i].std.vol.had) {
-      chan[i].outVol=(chan[i].vol*MIN(chan[i].std.vol.val,255))/255;
+      chan[i].outVol=(chan[i].vol*MIN(chan[i].std.vol.val,15))/15;
+    }
+    if (chan[i].std.ex1.had) {
+      chan[i].insCopy.noisePeriod=CLAMP(chan[i].std.ex1.val-1,1,255);
+    }
+    if (chan[i].std.ex2.had) {
+      chan[i].insCopy.resetValue=CLAMP(chan[i].std.ex2.val,1,65535);
+    }
+    if (chan[i].std.ex3.had) {
+      chan[i].insCopy.lpfApproachSpeed=CLAMP(chan[i].std.ex3.val,0,255);
+    }
+    if (chan[i].std.ex4.had) {
+      chan[i].insCopy.lpfApproachDivider=CLAMP(chan[i].std.ex4.val-1,0,255);
     }
     if (NEW_ARP_STRAT) {
       chan[i].handleArp();

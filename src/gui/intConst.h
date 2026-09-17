@@ -23,6 +23,7 @@
 
 extern const int _ZERO;
 extern const int _ONE;
+extern const int _TWO;
 extern const int _THREE;
 extern const int _FOUR;
 extern const int _SEVEN;
@@ -38,6 +39,7 @@ extern const int _ONE_HUNDRED;
 extern const int _ONE_HUNDRED_TWENTY_SEVEN;
 extern const int _ONE_HUNDRED_SEVENTY_NINE;
 extern const int _TWO_HUNDRED_FIFTY_FIVE;
+extern const int _TWO_HUNDRED_FIFTY_SIX;
 extern const int _FIVE_HUNDRED_ELEVEN;
 extern const int _TWO_THOUSAND_FORTY_SEVEN;
 extern const int _FOUR_THOUSAND_NINETY_FIVE;
